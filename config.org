@@ -71,17 +71,170 @@ Sources for this section include [[https://github.com/magnars/.emacs.d/blob/mast
 
 #+end_src
 
+
+** Programming
+
+   #+BEGIN_SRC emacs-lisp
+     (defun my-prog-mode-hook ()
+       (linum-mode 1)
+       (message "Truncating long lines in programming mode...")
+       (toggle-truncate-lines t))
+     (add-hook 'prog-mode-hook 'my-prog-mode-hook)
+   #+END_SRC
+
+
+** Edit With Emacs
+
+   [[https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh?hl=en][Chrome plugin]]
+
+   Following Daniel here to use Emacs to edit posts on Discourse,
+   which has a post editor that overrides normal Emacs key bindings
+   with other functions. As such, ~markdown-mode~ is used.
+
+   #+begin_src emacs-lisp
+     (use-package edit-server
+       :ensure t
+       :config
+       (progn
+         (edit-server-start)
+         (setq edit-server-default-major-mode 'markdown-mode)
+         (setq edit-server-new-frame nil)))
+   #+end_src
+
+
+** Grep
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'grep-mode-hook
+               '(lambda ()
+                  (progn
+                    (message "Truncating long lines in grep mode...")
+                    (toggle-truncate-lines t))))
+   #+END_SRC
+** Hide-Show 
+   for hs-minor-mode
+
+   Glbally hyper h/t will hide/toggle, enabling hs-minor-mode if necessary.
+
+   So you can just move to a code block and H-h to hide it or H-t to toggle. 
+
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "H-h") 'enable-hs-and-hide-block)
+     (global-set-key (kbd "H-s") (kbd "C-c @ C-s")) ; show block
+     (global-set-key (kbd "H-t") 'enable-hs-and-toggle-hiding)
+
+     (defun enable-hs-and-hide-block ()
+       "Enable hs-minor-mode if it isn't on and hide the source block"
+       (interactive)
+       (unless (bound-and-true-p hs-minor-mode)
+           (hs-minor-mode 1)
+           (message "hs-minor-mode enabled"))
+       (hs-hide-block))
+
+     (defun enable-hs-and-toggle-hiding ()
+       "Enable hs-minor-mode if it isn't on and toggle-hiding"
+       (interactive)
+       (unless (bound-and-true-p hs-minor-mode)
+           (hs-minor-mode 1)
+           (message "hs-minor-mode enabled"))
+       (hs-toggle-hiding))
+   #+END_SRC
+
+* Modes (Alphabetical)
+** Exec path from shell
+   So emacs can also find executables (like "coffee" for coffee-repl).
+   See [[https://github.com/purcell/exec-path-from-shell][repo  documentation]].
+   #+begin_src emacs-lisp
+     (use-package exec-path-from-shell
+       :ensure t
+       :init
+       (exec-path-from-shell-initialize))
+   #+end_src  
+
+** Flycheck
+   #+begin_src emacs-lisp
+     (use-package flycheck
+       :ensure t
+       :config
+       (progn
+         (global-flycheck-mode)))
+   #+end_src
+
+** Ido
+
+   See also useful commands [[*ido-mode][ido-mode]]
+
+   #+begin_src emacs-lisp
+     (use-package ido
+       :init
+       (setq ido-enable-flex-matching t)
+       (setq ido-everywhere t)
+       (ido-mode t)
+       (use-package ido-vertical-mode
+         :ensure t
+         :defer t
+         :init (ido-vertical-mode 1)
+         (setq ido-vertical-define-keys 'C-n-and-C-p-only)))
+   #+end_src
+
+
+** Smartscan
+
+   Quickly move to previous and next symbol under the cursor (or replace)
+
+   #+begin_src emacs-lisp
+     (use-package smartscan
+       :ensure t
+       :config (global-smartscan-mode 1)
+       :bind (("M-n" . smartscan-symbol-go-forward)
+              ("M-p" . smartscan-symbol-go-backward)
+              ("M-'" . smartscan-symbol-replace) ; overrides abbrev-prefix-mark
+              ))
+   #+end_src
+
+** Magit
+
+A great interface for git projects. It's much more pleasant to use
+than the git interface on the command line. Use an easy keybinding to
+access magit.
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind ("C-c g" . magit-status)
+    :config
+    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
+#+end_src
+
+** Markdown
+   #+begin_src emacs-lisp
+     (use-package markdown-mode
+       :defer t
+       :ensure t)
+   #+end_src
+
+** Multiple Cursors
+
+   For some reason I need to require 'cl. Some of the mc libraries
+   require 'cl-lib, but that doesn't seem to be enough.
+
+   #+begin_src emacs-lisp
+     (use-package multiple-cursors
+       :ensure t
+       :init
+       (require 'cl)
+       :bind (("C-S-c C-S-c" . mc/edit-lines)
+              ("C->"         . mc/mark-next-like-this)
+              ("C-<"         . mc/mark-previous-like-this)
+              ("C-c C-<"     . mc/mark-all-like-this)
+              ("C-!"         . mc/mark-next-symbol-like-this)
+              ("s-d"         . mc/mark-all-dwim)))
+   #+end_src
+
+
 * Nyan mode
 #+BEGIN_SRC emacs-lisp
   (use-package nyan-mode
     :ensure t)
-#+END_SRC
-* Magit
-#+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :ensure t
-    :bind (("C-x g" . magit-status)))
-''(setq magit-git-executable "~/tools/bin/git")
 #+END_SRC
 
 * Theme
