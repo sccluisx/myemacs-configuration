@@ -213,10 +213,8 @@ access magit.
    #+end_src
 
 ** Multiple Cursors
-
    For some reason I need to require 'cl. Some of the mc libraries
    require 'cl-lib, but that doesn't seem to be enough.
-
    #+begin_src emacs-lisp
      (use-package multiple-cursors
        :ensure t
@@ -229,14 +227,164 @@ access magit.
               ("C-!"         . mc/mark-next-symbol-like-this)
               ("s-d"         . mc/mark-all-dwim)))
    #+end_src
+*** To use:
 
+    If you have
 
-* Nyan mode
-#+BEGIN_SRC emacs-lisp
-  (use-package nyan-mode
-    :ensure t)
-#+END_SRC
+    print "foo", foo
 
+    You can change both foos to bar by:
+    1. Select the first foo in a region (move to 1st f, C-space, M-f)
+    2. C-> (to start multiple-cursors)
+    3. type "bar"
+    4. C-g or <return> to end
+  
+
+** Org mode
+*** key bindings
+
+    See also useful commands [[*org-mode][org-mode]]
+
+    #+begin_src emacs-lisp
+      (bind-key "C-c l" 'org-store-link)
+      (bind-key "C-c c" 'org-capture)
+      (bind-key "C-c a" 'org-agenda)
+      (global-set-key "\C-cb" 'org-iswitchb)
+    #+end_src
+
+*** Org-bullets
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-bullets
+        :ensure t)
+    #+END_SRC
+
+*** Org hide markers
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-hide-emphasis-markers t)
+    #+END_SRC
+
+*** Hooks
+
+    The clocking expressions are for [[http://orgmode.org/manual/Clocking-work-time.html][clocking work time]].
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'org-mode-hook (lambda ()
+                                 (setq org-clock-persist 'history)
+                                 (org-clock-persistence-insinuate)
+                                 (org-bullets-mode 1)
+                                 (auto-fill-mode 1)
+                                 ; (indent-tabs-mode t)
+                                 ))
+    #+END_SRC
+
+*** Todo
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-todo-keywords
+            '((sequence "TODO" "IN_PROGRESS" "|" "DONE")))
+    #+END_SRC
+
+** Package
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'package-menu-mode-hook
+               (lambda ()
+                 (progn
+                   (message "Truncating long lines in package menu mode...")
+                   (toggle-truncate-lines t))))
+   #+END_SRC
+** Phi-search and Phi-replace
+   works with multiple cursors
+   #+BEGIN_SRC emacs-lisp
+     (use-package phi-search
+       :defer t
+       :ensure t
+       :config
+       (require 'phi-replace)
+       (global-set-key (kbd "M-%") 'phi-replace-query))
+   #+END_SRC
+** "Pretty C-l"
+   Display Control-l characters in a pretty way
+   #+begin_src emacs-lisp
+     (use-package pp-c-l
+       :ensure t
+       :config
+       (pretty-control-l-mode 1)
+       )
+   #+end_src
+** Python
+   See also useful commands [[*python-mode][python-mode]]
+   #+begin_src emacs-lisp
+     (use-package python-mode
+       :defer t
+       :ensure t
+       :config
+       (python-shell-interpreter "ipython"))
+   #+end_src
+** Projectile
+
+   #+BEGIN_QUOTE
+   Project navigation and management library for Emacs.
+   #+END_QUOTE
+
+  http://batsov.com/projectile/
+
+   #+begin_src emacs-lisp
+     (use-package projectile
+       :ensure t
+       :diminish projectile-mode
+       :commands projectile-mode
+       :config
+       (progn
+         (projectile-global-mode t)
+         (setq projectile-enable-caching t)
+         (use-package ag
+           :commands ag
+           :ensure t)))
+   #+end_src
+
+** Recentf
+
+   Recentf is a minor mode that builds a list of recently opened
+   files. This list is is automatically saved across sessions on
+   exiting Emacs - you can then access this list through a command or
+   the menu.
+
+   https://www.emacswiki.org/emacs/RecentFiles
+
+   #+begin_src emacs-lisp
+     (use-package recentf
+       :bind ("C-x C-r" . helm-recentf)
+       :config
+       (progn
+         (recentf-mode t)
+         (setq recentf-max-saved-items 200)))
+   #+end_src
+
+** Yasnippet
+   See also useful commands [[*yas-mode][yas-mode]]
+   #+BEGIN_SRC sh
+     # to install AndreaCrotti's yasnippets
+     cd ~/.emacs.d
+     mkdir -p yasnippets
+     git clone --recursive https://github.com/capitaomorte/yasnippet snippets
+   #+END_SRC
+   #+BEGIN_SRC sh
+     # to update
+     cd ~/.emacs.d/yasnippets
+     git submodule update --init
+   #+END_SRC
+   #+begin_src emacs-lisp
+     (use-package yasnippet
+       :ensure t
+       :defer t
+       :diminish yas-minor-mode
+       :config
+       (progn
+         (setq yas-snippet-dirs (concat user-emacs-directory "yasnippets/snippets"))
+         (yas-global-mode 1)))
+   #+end_src
 * Theme
 #+BEGIN_SRC emacs-lisp
   (use-package zenburn-theme
@@ -261,31 +409,241 @@ access magit.
 (push 'fontify-frame after-make-frame-functions)
 #+END_SRC
 
+* Nyan mode
+#+BEGIN_SRC emacs-lisp
+  (use-package nyan-mode
+    :ensure t)
+#+END_SRC
 
-* Yasnippet
 
-   See also useful commands [[*yas-mode][yas-mode]]
 
-   #+BEGIN_SRC sh
-     # to install AndreaCrotti's yasnippets
-     cd ~/.emacs.d
-     mkdir -p yasnippets
-     git clone --recursive https://github.com/capitaomorte/yasnippet snippets
-   #+END_SRC
 
-   #+BEGIN_SRC sh
-     # to update
-     cd ~/.emacs.d/yasnippets
-     git submodule update --init
-   #+END_SRC
+* Understand
+** Key bindings
 
-   #+begin_src emacs-lisp
-     (use-package yasnippet
-       :ensure t
-       :defer t
-       :diminish yas-minor-mode
-       :config
-       (progn
-         (setq yas-snippet-dirs (concat user-emacs-directory "yasnippets/snippets"))
-         (yas-global-mode 1)))
-   #+end_src
+   [[https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf][Cheatsheet for emacs v24]]
+
+*** Prefixes
+    You can see all commands that begin with a prefix by using C-h afterward,
+    e.g `C-x C-h` or `C-x 4 C-h` or `C-c C-h`
+
+    C-x is for built-in emacs commands
+
+    C-c is for customized (major and minor mode) commands
+** Remember these!
+*** Default Key bindings
+
+    Some bindings I'm practicing remembering.
+
+    Checkout http://orgmode.org/manual/Tables.html if you haven't seen them
+
+    |-------------+-------------------------------------------|
+    | Key Binding | Description                               |
+    |-------------+-------------------------------------------|
+    | C-/         | undo or expand word                       |
+    |             | does expand word if at the end of a word  |
+    |-------------+-------------------------------------------|
+    | C-h v       | describe-variable                         |
+    |             | put cursor on a variable in an elisp file |
+    |             | default will be the variable              |
+    |-------------+-------------------------------------------|
+    | C-u C-space | cycle through previously set marks        |
+    |-------------+-------------------------------------------|
+    | C-x C-e     | eval last sexp                            |
+    |             | Symbolic EXPression, elisp                |
+    |-------------+-------------------------------------------|
+    | C-x n w     | exit narrow region                        |
+    |-------------+-------------------------------------------|
+    | C-x n w     | exit narrow region                        |
+    |-------------+-------------------------------------------|
+    | C-y         | yank                                      |
+    |             | M-y then cycles through kill ring         |
+    |-------------+-------------------------------------------|
+    | C-S-delete  | delete entire line                        |
+    |-------------+-------------------------------------------|
+    | C-S-down    | select until last non-empty line          |
+    |             | great for code blocks                     |
+    |-------------+-------------------------------------------|
+    | C-M-\       | indent-region                             |
+    |-------------+-------------------------------------------|
+    | C-x ESC ESC | repeat-complex-command                    |
+    |-------------+-------------------------------------------|
+    | C-z         | zap to char                               |
+    |             | remember, you can set a numeric prefix    |
+    |             | `C-u 3 C-z x` to delete up to 3rd x       |
+    |-------------+-------------------------------------------|
+    | C-x z z z   | to repeat 3 times                         |
+    |             | like . in vi                              |
+    |-------------+-------------------------------------------|
+    | C-x 8 <RET> | unicode, eg. snowman ☃                    |
+    |             | enter unicode name,                       |
+    |             | like snowman (has completions)            |
+    |-------------+-------------------------------------------|
+    | C-x =       | what-cursor-position                      |
+    |-------------+-------------------------------------------|
+    | C-x C-=     | like +, increase font of buffer           |
+    |-------------+-------------------------------------------|
+    | C-x C-1     | decrease font of buffer                   |
+    |-------------+-------------------------------------------|
+
+
+    |-----------------------+-------------------------------|
+    | Pattern               | Description                   |
+    |-----------------------+-------------------------------|
+    | C-s then C-w then C-s | select and search             |
+    |                       | select moving forward by word |
+    |                       | then find the selection       |
+    |-----------------------+-------------------------------|
+    | C-s then C-w then M-w | select and copy               |
+    |-----------------------+-------------------------------|
+
+*** Key Bindings to my functions or customized
+
+    Definitions for these appear later in this file
+
+    |-------------+---------------------------------|
+    | Key Binding | Description                     |
+    |-------------+---------------------------------|
+    | H-h         | Hide a code block               |
+    | H-s         | Show a code block               |
+    | H-t         | Toggle hiding a code block      |
+    |-------------+---------------------------------|
+    | M-s o       | occur-dwim                      |
+    |-------------+---------------------------------|
+    | H-o         | 'browse-url-of-buffer (builtin) |
+    |-------------+---------------------------------|
+
+*** Mode specific
+**** hs-minor-mode
+
+     |-------------------+---------------------------|
+     | Command           | Description               |
+     |-------------------+---------------------------|
+     | M-x hs-minor-mode | hide-show                 |
+     |-------------------+---------------------------|
+     | M-x hs-hide-all   | hide all comments         |
+     |-------------------+---------------------------|
+     | M-x hs-show-all   | show all (comments again) |
+     |-------------------+---------------------------|
+
+**** html-mode
+
+     |---------+-----------------|
+     | Command | Description     |
+     |---------+-----------------|
+     | C-c C-t | tag             |
+     |---------+-----------------|
+     | C-c /   | close-tag       |
+     |---------+-----------------|
+     | C-c C-v | view in browser |
+     |---------+-----------------|
+
+**** flycheck-mode
+
+     |---------+-----------------------|
+     | Command | Description           |
+     |---------+-----------------------|
+     | C-c ! v | flycheck-verify-setup |
+     |---------+-----------------------|
+
+**** ido-mode
+
+     |---------+--------------|
+     | Command | Description  |
+     |---------+--------------|
+     | C-f     | in ido exits |
+     |---------+--------------|
+
+**** org-mode
+
+     |---------+-------------------------------------------|
+     | Command | Description                               |
+     |---------+-------------------------------------------|
+     | C-c C-c | in a new #+TODO line will reload org mode |
+     |---------+-------------------------------------------|
+     | C-c l   | org-store-link                            |
+     |---------+-------------------------------------------|
+     | C-c C-l | org-insert-link                           |
+     |---------+-------------------------------------------|
+     | C-c *   | org-toggle-heading                        |
+     |         | first select a bunch of lines to promote  |
+     |---------+-------------------------------------------|
+     | C-c -   | Cycle bullets (‘-’, ‘+’, ‘*’, ‘1.’, ‘1)’) |
+     |         | C-x z z ... to repeat as usual            |
+     |---------+-------------------------------------------|
+
+     [[http://orgmode.org/manual/Easy-Templates.html][Easy Templates]]
+
+     <s         then <TAB> to get a source block     
+
+     <q         then <TAB> to get a quote
+
+**** python-mode
+
+     |---------+----------------------------------------------------------|
+     | Command | Description                                              |
+     |---------+----------------------------------------------------------|
+     | C-c C-c | python-shell-switch-to-shell to execute the current file |
+     |---------+----------------------------------------------------------|
+     | C-c C-z | python-shell-switch-to-shell to view the shell buffer    |
+     |---------+----------------------------------------------------------|
+
+**** yas-mode
+
+     A variable can also have a default value which is specified like
+     this: ${1:object}.
+
+     see: http://blog.refu.co/?p=1355
+
+     |-------------------------+--------------------------------------------|
+     | Command                 | Description                                |
+     |-------------------------+--------------------------------------------|
+     | M-x yas-describe-tables | gives a table representation of all        |
+     |                         | the snippets available in the current mode |
+     |-------------------------+--------------------------------------------|
+
+*** M-x commands
+
+    |--------------------------------+--------------------|
+    | Command                        | Description        |
+    |--------------------------------+--------------------|
+    | M-x customize-variable         |                    |
+    |--------------------------------+--------------------|
+    | M-x customize-face RET default |                    |
+    |--------------------------------+--------------------|
+    | M-x customize-group            | emacs              |
+    |                                | grep               |
+    |--------------------------------+--------------------|
+    | M-x ffap                       | find-file-at-point |
+    |--------------------------------+--------------------|
+    | M-x list-colors-display        |                    |
+    |--------------------------------+--------------------|
+
+*** Clicking
+
+    To select "org-mode-hook" with your mouse, click on the '-'
+    otherwise click on "org" to select only that part.
+
+* Test
+
+  #+BEGIN_SRC emacs-lisp
+    (defun init ()
+      "Test to quickly load my init file."
+      (interactive)
+      (load (concat user-emacs-directory "init.el")))
+  #+END_SRC
+* Run Last
+
+  Open file work_init.el or home_init.el depending on which computer
+  I'm on. Since they don't belong in my repo they are listed in my
+  .gitignore file.
+
+  #+BEGIN_SRC emacs-lisp
+    (setq locations '("home" "work"))
+    (dolist (loc locations)
+      (let ((init-file (concat user-emacs-directory (concat loc "_init.el"))))
+        (if (file-exists-p init-file)
+            (progn
+              (message (concat "loading " init-file))
+              (load init-file)))))
+  #+END_SRC
