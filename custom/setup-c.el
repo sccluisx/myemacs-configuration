@@ -1,5 +1,6 @@
 ;; company-c-headers
 (use-package company-c-headers
+  :ensure t
   :init
   (add-to-list 'company-backends 'company-c-headers))
 
@@ -20,6 +21,7 @@
 (setq c-default-style) "linux" ;; set style to "linux"
 
 (use-package cc-mode
+  :ensure t
   :init
   (define-key c-mode-map  [(tab)] 'company-complete)
   (define-key c++-mode-map  [(tab)] 'company-complete))

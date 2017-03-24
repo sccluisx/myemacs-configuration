@@ -34,6 +34,7 @@
 
 ;; company
 (use-package company
+  :ensure t
   :init
   (global-company-mode 1)
   (delete 'company-semantic company-backends))
@@ -42,12 +43,14 @@
 
 ;; Package: projejctile
 (use-package projectile
+  :ensure t
   :init
   (projectile-global-mode)
   (setq projectile-enable-caching t))
 
 ;; Package zygospore
 (use-package zygospore
+  :ensure t
   :bind (("C-x 1" . zygospore-toggle-delete-other-windows)
          ("RET" .   newline-and-indent)))
 
