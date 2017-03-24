@@ -1,0 +1,15 @@
+/work_init.el
+/home_init.el
+/config.el
+/elpa/
+/ido.last
+/bookmarks
+/backups/
+/auto-save-list/
+/projectile-bookmarks.eld
+/recentf
+/helm-doc.org
+/url/
+/tramp
+/.mc-lists.el
+/org-clock-save.el

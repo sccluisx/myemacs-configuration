@@ -1,0 +1,75 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Luis Enrique Ramirez CHavez
+
+* Personal Information
+#+begin_src emacs-lisp
+(setq user-full-name "Luis Enrique Ramirez Chavez"
+      user-mail-address "sccluisx@gmail.com")
+#+end_src
+
+
+* Nyan mode
+#+BEGIN_SRC emacs-lisp
+  (use-package nyan-mode
+    :ensure t)
+#+END_SRC
+* Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind (("C-x g" . magit-status)))
+''(setq magit-git-executable "~/tools/bin/git")
+#+END_SRC
+
+* Theme
+#+BEGIN_SRC emacs-lisp
+  (use-package zenburn-theme
+    :ensure t 
+    :init
+    (progn
+      (load-theme 'zenburn t)
+      (set-face-attribute 'mode-line nil
+                          :box nil)
+      (set-face-attribute 'mode-line-inactive nil
+                          :box nil)))
+(custom-set-faces
+;; custom-set-faces was added by Custom.
+;; If you edit it by hand, you could mess it up, so be careful.
+;; Your init file should contain only one such instance.
+;; If there is more than one, they won't work right.
+)(defun fontify-frame (frame)
+(set-frame-parameter frame 'font "Source Code Pro-12"))
+;; Fontify current frame
+(fontify-frame nil)
+;; Fontify any future frames
+(push 'fontify-frame after-make-frame-functions)
+#+END_SRC
+
+
+* Yasnippet
+
+   See also useful commands [[*yas-mode][yas-mode]]
+
+   #+BEGIN_SRC sh
+     # to install AndreaCrotti's yasnippets
+     cd ~/.emacs.d
+     mkdir -p yasnippets
+     git clone --recursive https://github.com/capitaomorte/yasnippet snippets
+   #+END_SRC
+
+   #+BEGIN_SRC sh
+     # to update
+     cd ~/.emacs.d/yasnippets
+     git submodule update --init
+   #+END_SRC
+
+   #+begin_src emacs-lisp
+     (use-package yasnippet
+       :ensure t
+       :defer t
+       :diminish yas-minor-mode
+       :config
+       (progn
+         (setq yas-snippet-dirs (concat user-emacs-directory "yasnippets/snippets"))
+         (yas-global-mode 1)))
+   #+end_src
